@@ -317,109 +317,109 @@ module RBS
         end
       end
 
-      def parse_params(args_node, args, method_type, variables:)
-        vars = (node_to_hash(each_arg(args).to_a[0]) || {}).transform_values {|value| type_of(value, variables: variables) }
+      # def parse_params(args_node, args, method_type, variables:)
+      #   vars = (node_to_hash(each_arg(args).to_a[0]) || {}).transform_values {|value| type_of(value, variables: variables) }
 
-        required_positionals = []
-        optional_positionals = []
-        rest_positionals = nil
-        trailing_positionals = []
-        required_keywords = {}
-        optional_keywords = {}
-        rest_keywords = nil
+      #   required_positionals = []
+      #   optional_positionals = []
+      #   rest_positionals = nil
+      #   trailing_positionals = []
+      #   required_keywords = {}
+      #   optional_keywords = {}
+      #   rest_keywords = nil
 
-        var_names = args_node.children[0]
-        pre_num, _pre_init, opt, _first_post, post_num, _post_init, rest, kw, kwrest, block = args_node.children[1].children
+      #   var_names = args_node.children[0]
+      #   pre_num, _pre_init, opt, _first_post, post_num, _post_init, rest, kw, kwrest, block = args_node.children[1].children
 
-        pre_num.times.each do |i|
-          name = var_names[i]
-          type = vars[name] || Types::Bases::Any.new(location: nil)
-          required_positionals << Types::Function::Param.new(type: type, name: name)
-        end
+      #   pre_num.times.each do |i|
+      #     name = var_names[i]
+      #     type = vars[name] || Types::Bases::Any.new(location: nil)
+      #     required_positionals << Types::Function::Param.new(type: type, name: name)
+      #   end
 
-        index = pre_num
-        while opt
-          name = var_names[index]
-          if (type = vars[name])
-            optional_positionals << Types::Function::Param.new(type: type, name: name)
-          end
-          index += 1
-          opt = opt.children[1]
-        end
+      #   index = pre_num
+      #   while opt
+      #     name = var_names[index]
+      #     if (type = vars[name])
+      #       optional_positionals << Types::Function::Param.new(type: type, name: name)
+      #     end
+      #     index += 1
+      #     opt = opt.children[1]
+      #   end
 
-        if rest
-          name = var_names[index]
-          if (type = vars[name])
-            rest_positionals = Types::Function::Param.new(type: type, name: name)
-          end
-          index += 1
-        end
+      #   if rest
+      #     name = var_names[index]
+      #     if (type = vars[name])
+      #       rest_positionals = Types::Function::Param.new(type: type, name: name)
+      #     end
+      #     index += 1
+      #   end
 
-        post_num.times do |i|
-          name = var_names[i+index]
-          if (type = vars[name])
-            trailing_positionals << Types::Function::Param.new(type: type, name: name)
-          end
-          index += 1
-        end
+      #   post_num.times do |i|
+      #     name = var_names[i+index]
+      #     if (type = vars[name])
+      #       trailing_positionals << Types::Function::Param.new(type: type, name: name)
+      #     end
+      #     index += 1
+      #   end
 
-        while kw
-          name, value = kw.children[0].children
-          if (type = vars[name])
-            if value
-              optional_keywords[name] = Types::Function::Param.new(type: type, name: name)
-            else
-              required_keywords[name] = Types::Function::Param.new(type: type, name: name)
-            end
-          end
+      #   while kw
+      #     name, value = kw.children[0].children
+      #     if (type = vars[name])
+      #       if value
+      #         optional_keywords[name] = Types::Function::Param.new(type: type, name: name)
+      #       else
+      #         required_keywords[name] = Types::Function::Param.new(type: type, name: name)
+      #       end
+      #     end
 
-          kw = kw.children[1]
-        end
+      #     kw = kw.children[1]
+      #   end
 
-        if kwrest
-          name = kwrest.children[0]
-          if (type = vars[name])
-            rest_keywords = Types::Function::Param.new(type: type, name: name)
-          end
-        end
+      #   if kwrest
+      #     name = kwrest.children[0]
+      #     if (type = vars[name])
+      #       rest_keywords = Types::Function::Param.new(type: type, name: name)
+      #     end
+      #   end
 
-        method_block = nil
-        if block
-          if (type = vars[block])
-            if type.is_a?(Types::Proc)
-              method_block = MethodType::Block.new(required: true, type: type.type)
-            elsif type.is_a?(Types::Bases::Any)
-              method_block = MethodType::Block.new(
-                required: true,
-                type: Types::Function.empty(Types::Bases::Any.new(location: nil))
-              )
-            # Handle an optional block like `T.nilable(T.proc.void)`.
-            elsif type.is_a?(Types::Optional) && type.type.is_a?(Types::Proc)
-              method_block = MethodType::Block.new(required: false, type: type.type.type)
-            else
-              STDERR.puts "Unexpected block type: #{type}"
-              PP.pp args_node, STDERR
-              method_block = MethodType::Block.new(
-                required: true,
-                type: Types::Function.empty(Types::Bases::Any.new(location: nil))
-              )
-            end
-          end
-        end
+      #   method_block = nil
+      #   if block
+      #     if (type = vars[block])
+      #       if type.is_a?(Types::Proc)
+      #         method_block = MethodType::Block.new(required: true, type: type.type)
+      #       elsif type.is_a?(Types::Bases::Any)
+      #         method_block = MethodType::Block.new(
+      #           required: true,
+      #           type: Types::Function.empty(Types::Bases::Any.new(location: nil))
+      #         )
+      #       # Handle an optional block like `T.nilable(T.proc.void)`.
+      #       elsif type.is_a?(Types::Optional) && type.type.is_a?(Types::Proc)
+      #         method_block = MethodType::Block.new(required: false, type: type.type.type)
+      #       else
+      #         STDERR.puts "Unexpected block type: #{type}"
+      #         PP.pp args_node, STDERR
+      #         method_block = MethodType::Block.new(
+      #           required: true,
+      #           type: Types::Function.empty(Types::Bases::Any.new(location: nil))
+      #         )
+      #       end
+      #     end
+      #   end
 
-        method_type.update(
-          type: method_type.type.update(
-            required_positionals: required_positionals,
-            optional_positionals: optional_positionals,
-            rest_positionals: rest_positionals,
-            trailing_positionals: trailing_positionals,
-            required_keywords: required_keywords,
-            optional_keywords: optional_keywords,
-            rest_keywords: rest_keywords
-          ),
-          block: method_block
-        )
-      end
+      #   method_type.update(
+      #     type: method_type.type.update(
+      #       required_positionals: required_positionals,
+      #       optional_positionals: optional_positionals,
+      #       rest_positionals: rest_positionals,
+      #       trailing_positionals: trailing_positionals,
+      #       required_keywords: required_keywords,
+      #       optional_keywords: optional_keywords,
+      #       rest_keywords: rest_keywords
+      #     ),
+      #     block: method_block
+      #   )
+      # end
 
       def type_of(type_node, variables:)
         type = type_of0(type_node, variables: variables)

@@ -10,6 +10,11 @@ PATH
       rainbow (>= 2.2.2, < 4.0)
       rbs (~> 0.11.0)
 
+PATH
+  remote: ..
+  specs:
+    rbs (0.11.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -38,7 +43,6 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rbs (0.11.0)
     thor (1.0.1)
     thread_safe (0.3.6)
     tzinfo (1.2.7)
@@ -49,6 +53,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  rbs!
   steep!
 
 BUNDLED WITH

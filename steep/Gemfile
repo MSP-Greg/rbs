@@ -1,3 +1,4 @@
 source "https://rubygems.org"
 
-gem "steep"
+gemspec path: ".."
+gem "steep", path: "../../steep"
