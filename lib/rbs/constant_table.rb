@@ -17,7 +17,7 @@ module RBS
     end
 
     def absolute_type(type, context:)
-      type.map_type_name do |type_name, location, _|
+      type.map_type_name do |type_name, location|
         absolute_type_name(type_name, context: context, location: location)
       end
     end
