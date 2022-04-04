@@ -12,7 +12,7 @@ gem "rubocop"
 gem "rubocop-rubycw"
 gem "json"
 gem "json-schema"
-gem 'stackprof'
+gem 'stackprof', :platforms => :jruby
 gem "goodcheck"
 gem "dbm"
 gem 'digest'

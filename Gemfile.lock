@@ -79,7 +79,6 @@ GEM
       rake (>= 0.8.1)
     ruby-progressbar (1.11.0)
     singleton (0.1.1)
-    stackprof (0.2.19)
     stringio (3.0.1)
     strong_json (2.1.2)
     tempfile (0.1.2)
@@ -88,8 +87,7 @@ GEM
     unicode-display_width (2.1.0)
 
 PLATFORMS
-  ruby
-  x86_64-darwin-20
+  x64-mingw-ucrt
 
 DEPENDENCIES
   dbm
@@ -114,4 +112,4 @@ DEPENDENCIES
   test-unit
 
 BUNDLED WITH
-   2.2.32
+   2.4.0.dev
